@@ -62,22 +62,38 @@ const registerForPushNotificationsAsync = async () => {
 
 const App = () => {
   const [expoPushToken, setExpoPushToken] = useState("");
+  const [channelId, setChannelId] = useState("");
   const notificationListener = useRef();
   const responseListener = useRef();
+  const clickListener = useRef();
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) =>
-      setExpoPushToken(token)
-    );
+    registerForPushNotificationsAsync().then((token) => {
+      setExpoPushToken(token);
+    });
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
-        console.log("NOTIFICATION RECEIVED", notification);
+        // console.log(
+        //   "NOTIFICATION RECEIVED",
+        //   notification?.request?.content?.data?.channel_id
+        // );
+      });
+
+    clickListener.current =
+      Notifications.addNotificationResponseReceivedListener((notification) => {
+        setChannelId(
+          notification.notification?.request?.content?.data?.channel_id
+        );
+        console.log(
+          notification.notification.request.content.data.channel_id,
+          "PRESSED"
+        );
       });
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log("NOTIFICATION RESPONSE RECEIVED", response);
+        // console.log("NOTIFICATION RESPONSE RECEIVED", response);
       });
 
     return () => {
@@ -85,6 +101,7 @@ const App = () => {
         notificationListener.current
       );
       Notifications.removeNotificationSubscription(responseListener.current);
+      Notifications.removeNotificationSubscription(clickListener.current);
     };
   }, []);
 
@@ -92,7 +109,11 @@ const App = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
 
-      <ContentView expoPushToken={expoPushToken} />
+      <ContentView
+        expoPushToken={expoPushToken}
+        channelId={channelId}
+        setChannelId={setChannelId}
+      />
     </SafeAreaView>
   );
 };

@@ -2,7 +2,7 @@ import { WebView } from "react-native-webview";
 import { View } from "react-native";
 import { getStatusBarHeight } from "react-native-status-bar-height";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 
 const styles = {
@@ -12,11 +12,21 @@ const styles = {
   },
 };
 
-const ContentView = ({ expoPushToken }) => {
+const ContentView = ({ expoPushToken, channelId, setChannelId }) => {
   const [uri, setUri] = useState("http://192.168.3.88:10015");
   // const [uri, setUri] = useState("https://erp-dev.battech.vn/");
 
   const webviewRef = useRef(null);
+
+  useEffect(() => {
+    if (channelId) {
+      setUri(
+        (uri) =>
+          `${uri}/web#menu_id=75&cids=1&default_active_id=mail.box_inbox&action=104&active_id=mail.channel_${channelId}`
+      );
+      setChannelId("");
+    }
+  }, [channelId]);
 
   const sendNotifications = (message) => {
     Notifications.scheduleNotificationAsync({
