@@ -12,21 +12,19 @@ const styles = {
   },
 };
 
-const ContentView = ({ expoPushToken, channelId, setChannelId }) => {
-  const [uri, setUri] = useState("http://192.168.3.88:10015");
-  // const [uri, setUri] = useState("https://erp-dev.battech.vn/");
+const ContentView = ({ expoPushToken, channelId }) => {
+  // const [uri, setUri] = useState("http://192.168.3.88:10015");
+  const originalUri = "https://erp-dev.battech.vn";
+  const [uri, setUri] = useState(originalUri);
 
   const webviewRef = useRef(null);
 
   useEffect(() => {
-    if (channelId) {
+    if (channelId.id)
       setUri(
-        (uri) =>
-          `${uri}/web#menu_id=75&cids=1&default_active_id=mail.box_inbox&action=104&active_id=mail.channel_${channelId}`
+        `${originalUri}/web#cids=1&default_active_id=mail.box_inbox&action=115&menu_id=79&active_id=mail.channel_${channelId.id}`
       );
-      setChannelId("");
-    }
-  }, [channelId]);
+  }, [channelId.pressEvent]);
 
   const sendNotifications = (message) => {
     Notifications.scheduleNotificationAsync({
@@ -45,9 +43,9 @@ const ContentView = ({ expoPushToken, channelId, setChannelId }) => {
   return (
     <View style={styles.container}>
       <WebView
-        key={uri}
+        key={channelId.pressEvent}
         source={{
-          uri,
+          uri: uri,
           headers,
         }}
         onLoadStart={(navState) => {

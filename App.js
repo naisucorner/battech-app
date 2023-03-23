@@ -62,7 +62,7 @@ const registerForPushNotificationsAsync = async () => {
 
 const App = () => {
   const [expoPushToken, setExpoPushToken] = useState("");
-  const [channelId, setChannelId] = useState("");
+  const [channelId, setChannelId] = useState({ id: "", pressEvent: false });
   const notificationListener = useRef();
   const responseListener = useRef();
   const clickListener = useRef();
@@ -82,13 +82,17 @@ const App = () => {
 
     clickListener.current =
       Notifications.addNotificationResponseReceivedListener((notification) => {
-        setChannelId(
-          notification.notification?.request?.content?.data?.channel_id
-        );
         console.log(
           notification.notification.request.content.data.channel_id,
           "PRESSED"
         );
+        setChannelId((ev) => {
+          const ret = {
+            id: notification.notification?.request?.content?.data?.channel_id,
+            pressEvent: !ev.pressEvent,
+          };
+          return ret;
+        });
       });
 
     responseListener.current =
@@ -109,11 +113,7 @@ const App = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
 
-      <ContentView
-        expoPushToken={expoPushToken}
-        channelId={channelId}
-        setChannelId={setChannelId}
-      />
+      <ContentView expoPushToken={expoPushToken} channelId={channelId} />
     </SafeAreaView>
   );
 };
