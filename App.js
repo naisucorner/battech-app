@@ -1,58 +1,100 @@
-import React, { Component, useState } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, Dimensions, StatusBar } from 'react-native';
-import { WebView, PixelRatio } from 'react-native-webview';
+import { useEffect, useState, useRef } from "react";
+import { StyleSheet, StatusBar, Platform, SafeAreaView } from "react-native";
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+// import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-export default function App() {
-  const customHTML = `
-      <body style="display:flex; flex-direction: column;justify-content: center; 
-        align-items:center; background-color: black; color:white; height: 100%;">
-          <h1 style="font-size:100px; padding: 50px; text-align: center;" 
-          id="h1_element">
-            This is simple html
-          </h1>
-          <h2 style="display: block; font-size:80px; padding: 50px; 
-          text-align: center;" id="h2_element">
-            This text will be changed later!
-          </h2>
-       </body>`;
-  const [webviewHeight, setWebviewHeight] = useState(0);
-  const onProductDetailsWebViewMessage = event => {
-    setWebviewHeight(Number(event.nativeEvent.data)/PixelRatio.get())
-  }
-  const deviceHieght = Dimensions.get('window').height;
-  const webViewHieght = deviceHieght;
-  return (
-    <View style={{height: webViewHieght}}>
-      <StatusBar barStyle="dark-content" />
-              <SafeAreaView style={{flex: 1}}>
-              <WebView 
-                source={{ uri: 'https://erp.battech.vn/en/web/login' }} 
-                allowFileAccess={true}
-                scalesPageToFit={false}
-                originWhitelist={['*']}
-                automaticallyAdjustContentInsets={true}
-                javaScriptEnabled={true}
-                startInLoadingState={true}
-                domStorageEnabled={true}
-                style={{
-                  width: '100%',
-                  height: 50000,
-                  flex: 1
-                }}
-                //injectedJavaScript='window.ReactNativeWebView.postMessage(document.body.scrollHeight)'
-                injectedJavaScript={`const meta = document.createElement('meta'); meta.setAttribute('content', 'width=width, initial-scale=0.5, maximum-scale=0.5, user-scalable=2.0'); meta.setAttribute('name', 'viewport'); document.getElementsByTagName('head')[0].appendChild(meta); `}
-                //source={{ html: customHTML }} 
-              />
-              </SafeAreaView>
-    </View>
-  );
-}
+import ContentView from "./ContentView";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    // marginBottom: -50,
   },
 });
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => {
+    return {
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+      shouldShowAlert: true,
+    };
+  },
+});
+
+const registerForPushNotificationsAsync = async () => {
+  let token;
+
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  return token;
+};
+
+const App = () => {
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        console.log("NOTIFICATION RECEIVED", notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log("NOTIFICATION RESPONSE RECEIVED", response);
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor="white" barStyle="dark-content" />
+
+      <ContentView expoPushToken={expoPushToken} />
+    </SafeAreaView>
+  );
+};
+
+export default App;

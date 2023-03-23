@@ -3,6 +3,7 @@
     "name": "Battech",
     "slug": "battech",
     "version": "1.0.0",
+    "owner": "naisucorner",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -18,21 +19,24 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.battech"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.battech"
+      "package": "com.battech",
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "050e0eba-3b53-4936-bcd8-2ef688099347"
+        "projectId": "8d22cc90-cc34-4693-8b16-c0fe13c14e07"
       }
     }
   }

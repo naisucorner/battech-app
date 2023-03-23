@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "613104297012",
+    "project_id": "battech-app",
+    "storage_bucket": "battech-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:613104297012:android:ebf5d103255dc6c3c41661",
+        "android_client_info": {
+          "package_name": "com.battech"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "613104297012-co81pm6c6utag7scvgg9jbt6d2rbb00e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvd1mITNufbjfCsgNe5ryGaf-ZX_vwtoI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "613104297012-co81pm6c6utag7scvgg9jbt6d2rbb00e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
