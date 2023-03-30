@@ -15,9 +15,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.battech"
@@ -38,6 +36,24 @@
       "eas": {
         "projectId": "8d22cc90-cc34-4693-8b16-c0fe13c14e07"
       }
-    }
+    },
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#ffffff",
+      "androidMode": "default",
+      "iosDisplayInForeground": true
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#ffffff",
+          "androidMode": "default",
+          "sounds": [],
+          "iosDisplayInForeground": true
+        }
+      ]
+    ]
   }
 }

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { StyleSheet, StatusBar, Platform, SafeAreaView } from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
-// import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import uuid from "react-native-uuid";
 
 import ContentView from "./ContentView";
 
@@ -11,7 +11,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     justifyContent: "center",
-    // marginBottom: -50,
   },
 });
 
@@ -62,9 +61,8 @@ const registerForPushNotificationsAsync = async () => {
 
 const App = () => {
   const [expoPushToken, setExpoPushToken] = useState("");
-  const [channelId, setChannelId] = useState({ id: "", pressEvent: false });
-  const notificationListener = useRef();
-  const responseListener = useRef();
+  const [notificationUri, setNotificationUri] = useState("");
+  const [id, setId] = useState(uuid.v4());
   const clickListener = useRef();
 
   useEffect(() => {
@@ -72,39 +70,18 @@ const App = () => {
       setExpoPushToken(token);
     });
 
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        // console.log(
-        //   "NOTIFICATION RECEIVED",
-        //   notification?.request?.content?.data?.channel_id
-        // );
-      });
-
     clickListener.current =
       Notifications.addNotificationResponseReceivedListener((notification) => {
-        console.log(
-          notification.notification.request.content.data.channel_id,
-          "PRESSED"
+        setNotificationUri(
+          notification?.notification?.request?.content?.data?.uri
         );
-        setChannelId((ev) => {
-          const ret = {
-            id: notification.notification?.request?.content?.data?.channel_id,
-            pressEvent: !ev.pressEvent,
-          };
-          return ret;
-        });
-      });
 
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        // console.log("NOTIFICATION RESPONSE RECEIVED", response);
+        setId(uuid.v4());
+
+        Notifications.dismissAllNotificationsAsync();
       });
 
     return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
-      Notifications.removeNotificationSubscription(responseListener.current);
       Notifications.removeNotificationSubscription(clickListener.current);
     };
   }, []);
@@ -113,7 +90,11 @@ const App = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
 
-      <ContentView expoPushToken={expoPushToken} channelId={channelId} />
+      <ContentView
+        key={id}
+        expoPushToken={expoPushToken}
+        notificationUri={notificationUri}
+      />
     </SafeAreaView>
   );
 };
