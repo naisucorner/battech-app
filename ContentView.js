@@ -1,5 +1,6 @@
 import { WebView } from "react-native-webview";
 import { View } from "react-native";
+import * as Notifications from "expo-notifications";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -14,9 +15,22 @@ const ContentView = ({ expoPushToken, notificationUri }) => {
   // const originalUri = "http://192.168.3.88:10015";
   // const originalUri = "https://26215957-16-0-all.runbot106.odoo.com";
 
-
   const [uri, setUri] = useState(originalUri);
   const webviewRef = useRef(null);
+
+  const disableNoti = (event) => {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => {
+        if (event.url.includes("mail.box_inbox"))
+          return {
+            shouldShowAlert: false,
+          };
+        return {
+          shouldShowAlert: true,
+        };
+      },
+    });
+  };
 
   useEffect(() => {
     setUri(notificationUri ? notificationUri : originalUri);
@@ -35,6 +49,7 @@ const ContentView = ({ expoPushToken, notificationUri }) => {
           headers,
           sendHeadersToHosts: [originalUri],
         }}
+        onNavigationStateChange={disableNoti}
         onLoadStart={(navState) => {
           if (navState.nativeEvent.url.includes(`${originalUri}/web`)) {
             setUri(navState.nativeEvent.url);
