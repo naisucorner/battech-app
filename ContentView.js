@@ -14,7 +14,6 @@ const ContentView = ({ expoPushToken, notificationUri }) => {
   // const originalUri = "http://192.168.3.88:10015";
   // const originalUri = "https://26215957-16-0-all.runbot106.odoo.com";
 
-
   const [uri, setUri] = useState(originalUri);
   const webviewRef = useRef(null);
 
