@@ -1,5 +1,5 @@
 import { WebView } from "react-native-webview";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import * as Notifications from "expo-notifications";
 
 import { useEffect, useRef, useState } from "react";
@@ -38,6 +38,7 @@ const ContentView = ({ expoPushToken, notificationUri }) => {
 
   const headers = {
     "expo-push-token": expoPushToken,
+    "platform": Platform.OS,
   };
 
   return (
